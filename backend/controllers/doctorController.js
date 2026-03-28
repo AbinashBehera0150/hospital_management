@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
-import appointmentModel from "../models/appointmentModel.js";
+import appointmentModel from "../models/AppointmentModel.js";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import appointmentModel from "../models/appointmentModel.js";
+import appointmentModel from "../models/AppointmentModel.js";
 import doctorModel from "../models/doctorModel.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
