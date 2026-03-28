@@ -5,7 +5,7 @@ import userModel from "../models/userModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import nodemailer from 'nodemailer';
 import doctorModel from "../models/doctorModel.js";
-import appointmentModel from "../models/AppointmentModel.js";
+import appointmentModel from "../models/appointmentModel.js";
 import Stripe from 'stripe';
 
 
