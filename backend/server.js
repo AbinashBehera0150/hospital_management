@@ -7,6 +7,8 @@ import adminRouter from "./routes/adminRoute.js";
 import doctorRouter from "./routes/doctorRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import doctorModel from "./models/doctorModel.js";
+import http from "http";
+import { Server } from "socket.io";
 
 // app config
 const app = express();
@@ -19,6 +21,28 @@ connectCloudinary();
 // middlewares
 app.use(express.json());
 app.use(cors());
+
+// 1. Wrap your Express app in an HTTP server
+const server = http.createServer(app); 
+
+// 2. Initialize Socket.io and configure CORS to accept connections from your Vercel frontends
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Accepts all origins. For production, you can lock this down to your Vercel URLs later!
+    methods: ["GET", "POST"]
+  }
+});
+
+// 3. Listen for connections
+io.on("connection", (socket) => {
+  console.log("🟢 A user connected via WebSocket:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("🔴 User disconnected:", socket.id);
+  });
+});
+
+app.set('io', io);
 
 // api endpoint
 app.use("/api/admin", adminRouter); // localhost:4000/api/admin
@@ -52,4 +76,4 @@ app.patch("/update-address", async (req, res) => {
   }
 });
 // start the express app
-app.listen(port, () => console.log("Server started", port));
+server.listen(port, () => console.log("Server started", port));

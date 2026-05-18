@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
 import { assets } from "../../assets/assets";
 import { AppContext } from "../../context/AppContext";
+import { io } from 'socket.io-client';
 
 const DoctorDashboard = () => {
   const {
@@ -15,11 +16,31 @@ const DoctorDashboard = () => {
   } = useContext(DoctorContext);
   const { slotDateFormat, currency } = useContext(AppContext);
 
+  // 1. Initial Data Fetch
   useEffect(() => {
     if (dToken) {
       getDashData();
     }
   }, [dToken]);
+
+  // --- 2. NEW: WEBSOCKET LISTENER ---
+  useEffect(() => {
+    // Only connect the socket if the Doctor is actually logged in
+    if (dToken) { 
+      const socket = io(import.meta.env.VITE_BACKEND_URL);
+
+      socket.on("new_appointment_added", () => {
+        console.log("⚡ Real-time update: New appointment booked!");
+        getDashData(); // Instantly refresh the dashboard data!
+      });
+
+      // Cleanup function to close connection when they leave the page
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [dToken]);
+  // ----------------------------------
 
   return (
     dashData && (

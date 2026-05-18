@@ -2,17 +2,38 @@ import React, { useContext, useEffect } from "react";
 import { assets } from "../../assets/assets";
 import { AdminContext } from "../../context/AdminContext";
 import { AppContext } from "../../context/AppContext";
+import { io } from 'socket.io-client';
 
 const Dashboard = () => {
   const { aToken, getDashData, cancelAppointment, dashData } =
     useContext(AdminContext);
   const { slotDateFormat, currency } = useContext(AppContext);
 
+  // 1. Initial Data Fetch
   useEffect(() => {
     if (aToken) {
       getDashData();
     }
   }, [aToken]);
+
+  // --- 2. NEW: WEBSOCKET LISTENER ---
+  useEffect(() => {
+    // Only connect the socket if the Admin is actually logged in
+    if (aToken) {
+      const socket = io(import.meta.env.VITE_BACKEND_URL);
+
+      socket.on("new_appointment_added", () => {
+        console.log("⚡ Real-time update: New appointment booked!");
+        getDashData(); // Instantly refresh the dashboard data!
+      });
+
+      // Cleanup function
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [aToken]);
+  // ----------------------------------
 
   return (
     dashData && (
@@ -49,7 +70,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* --- BRAND NEW EARNINGS CARD --- */}
           <div className="flex items-center gap-2 bg-white p-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all">
             <img className="w-14" src={assets.earning_icon} alt="" />
             <div>
